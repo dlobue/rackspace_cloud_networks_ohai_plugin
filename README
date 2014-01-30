@@ -1,0 +1,63 @@
+
+This ohai plugin allows you to get to a machine's network info (ip, mac
+address, etc) on the interfaces attached to your Rackspace Cloud server using
+the name of the network rather than the the arbitrarily assigned eth* interface
+name.
+
+
+To give an example, say you create 3 cloud networks and attach them to your
+cloud server through the Rackspace control panel. You will now have an eth2,
+eth3, and eth4. Which is which? eth2 will be the first network you attached and
+eth4 is the network you most recently attached. You could try and make sure you
+always attach the interfaces in the same order every time, but this is fragile
+and could easily break since you are able to detach and reattach networks to
+your cloud server at any time.
+
+
+Or what if you have 2 cloud networks, db and queue for example. Some servers
+only have the db network attached, and others only have the queue network
+attached. Reasoning around when eth2 is on the db network and when it is on the
+queue network can get very messy very quickly.
+
+
+Luckily Rackspace attaches a label to each interface on your server accessible
+via metadata. So we can use this instead:
+
+	{
+	  "rackspace": {
+	    "cloud_networks": {
+	      "db": {
+		"broadcast": "192.168.6.255",
+		"mac": "XX:XX:XX:XX:XX:XX",
+		"netmask": "255.255.255.0",
+		"ip": "192.168.6.1"
+	      },
+	      "queue": {
+		"broadcast": "192.168.6.255",
+		"mac": "XX:XX:XX:XX:XX:XX",
+		"netmask": "255.255.255.0",
+		"ip": "192.168.6.1"
+	      },
+	      "private": {
+		"broadcast": "10.1.1.255",
+		"mac": "XX:XX:XX:XX:XX:XX",
+		"netmask": "255.255.192.0",
+		"ip": "10.1.1.2"
+	      },
+	      "public": {
+		"broadcast": "1.2.3.255",
+		"mac": "XX:XX:XX:XX:XX:XX",
+		"netmask": "255.255.255.0",
+		"ip": "1.2.3.4"
+	      }
+	    }
+	  }
+	}
+
+
+
+Installation:
+Just copy the plugin into your ohai plugin directory. If the version of ohai on
+your system is >=7.0.0 use the version found in the v7 directory. Otherwise use
+the version in pre-v7 directory.
+
