@@ -59,16 +59,17 @@ Ohai.plugin(:RackspaceCloudNetworks) do
 
   collect_data do    
     if !rackspace.nil?
-      mac_map = network[:interfaces].map do |iface,data|
+      mac_map = Hash[network[:interfaces].map do |iface,data|
         [data[:addresses].select {|addy,params|
             params['family'].eql?('lladdr')
           }.keys.first, iface]
-      end
+      end]
       cn = rackspace[:cloud_networks] = Mash.new
       get_network_interfaces.map do |name|
         extract_interface_data(name)
       end.compact.each do |d|
-        d[:interface] = mac_map[d[:mac]] if mac_map.has_key? d[:mac]
+        lbl = d.keys.first
+        d[lbl][:interface] = mac_map[d[lbl][:mac]] if mac_map.has_key? d[lbl][:mac]
         cn.update d
       end
     end
