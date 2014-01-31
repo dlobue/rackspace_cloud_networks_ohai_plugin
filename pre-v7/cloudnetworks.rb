@@ -21,6 +21,7 @@ XEN_NETWORK_PATH = "vm-data/networking"
 
 provides "rackspace/cloud_networks"
 require_plugin "rackspace"
+require_plugin "network"
 
 def get_network_interfaces
   status, stdout, stderr = run_command(:no_status_check => true, :command => "xenstore-list %s" % XEN_NETWORK_PATH)
@@ -56,10 +57,16 @@ end
 
 
 if !rackspace.nil?
+  mac_map = network[:interfaces].map do |iface,data|
+    [data[:addresses].select {|addy,params|
+        params['family'].eql?('lladdr')
+      }.keys.first, iface]
+  end
   cn = rackspace[:cloud_networks] = Mash.new
   get_network_interfaces.map do |name|
     extract_interface_data(name)
   end.compact.each do |d|
+    d[:interface] = mac_map[d[:mac]] if mac_map.has_key? d[:mac]
     cn.update d
   end
 end
