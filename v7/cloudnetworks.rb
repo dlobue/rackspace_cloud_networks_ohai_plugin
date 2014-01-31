@@ -29,6 +29,7 @@ Ohai.plugin(:RackspaceCloudNetworks) do
       so.stdout.each_line.map &:strip
     end
   rescue Ohai::Exceptions::Exec
+    Ohai::Log.warn("Unable to get list of network interfaces!")
     []
   end
 
@@ -38,6 +39,7 @@ Ohai.plugin(:RackspaceCloudNetworks) do
       JSON.parse(so.stdout.strip)
     end
   rescue Ohai::Exceptions::Exec
+    Ohai::Log.warn("Unable to get metadata for interface #{name}!")
     nil
   end
 

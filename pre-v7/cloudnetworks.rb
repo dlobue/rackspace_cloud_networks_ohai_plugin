@@ -28,6 +28,7 @@ def get_network_interfaces
     stdout.each_line.map &:strip
   end
 rescue Ohai::Exceptions::Exec
+  Ohai::Log.warn("Unable to get list of network interfaces!")
   []
 end
 
@@ -37,6 +38,7 @@ def get_interface_data(name)
     JSON.parse(stdout.strip)
   end
 rescue Ohai::Exceptions::Exec
+  Ohai::Log.warn("Unable to get metadata for interface #{name}!")
   nil
 end
 
